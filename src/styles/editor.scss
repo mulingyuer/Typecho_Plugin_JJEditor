@@ -1,6 +1,16 @@
 .jj-editor-container {
 	height: 500px;
+	position: relative;
+	overflow: hidden;
+	z-index: 100;
 }
 .jj-editor-container .bytemd {
 	height: 100%;
+}
+
+.medium-zoom-overlay {
+	z-index: 100;
+}
+.medium-zoom-image--opened {
+	z-index: 100;
 }

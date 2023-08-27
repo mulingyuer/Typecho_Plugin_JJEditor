@@ -1,7 +1,7 @@
 /*
  * @Author: mulingyuer
  * @Date: 2023-08-27 01:21:30
- * @LastEditTime: 2023-08-27 03:22:27
+ * @LastEditTime: 2023-08-27 15:25:52
  * @LastEditors: mulingyuer
  * @Description: 核心代码
  * @FilePath: /Typecho_Plugin_JJEditor/src/core/index.ts
@@ -11,12 +11,12 @@ import { Editor } from "bytemd";
 import "bytemd/dist/index.css";
 import zhHans from "bytemd/locales/zh_Hans.json";
 import gfm from "@bytemd/plugin-gfm";
-import gemoji from "@bytemd/plugin-gemoji";
-import highlight from "@bytemd/plugin-highlight";
-import "highlight.js/styles/default.css";
-import math from "@bytemd/plugin-math";
-import "katex/dist/katex.css";
+import highlight from "./plugins/highlight";
+// import "highlight.js/styles/default.css";
+import math from "./plugins/math";
+// import "katex/dist/katex.css";
 import mediumZoom from "@bytemd/plugin-medium-zoom";
+import mermaid from "./plugins/mermaid";
 
 export default class JJEditor {
 	/** 原生编辑器 */
@@ -40,7 +40,7 @@ export default class JJEditor {
 			props: {
 				value: this.nativeEditor.value,
 				locale: zhHans,
-				plugins: [gfm(), gemoji(), highlight(), math(), mediumZoom()]
+				plugins: [gfm(), highlight(), math(), mediumZoom(), mermaid()]
 			}
 		});
 		this.jjEditor.$on("change", this.onEditorChange);

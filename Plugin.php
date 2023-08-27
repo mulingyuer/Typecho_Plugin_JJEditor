@@ -24,7 +24,8 @@ class Plugin implements PluginInterface {
      */
     public static function activate() {
         // 在博客前端插入公共资源，比如css、js
-        \Typecho\Plugin::factory('Widget_Archive')->header   = __CLASS__.'::blogHeader';
+        \Typecho\Plugin::factory('Widget_Archive')->header = __CLASS__.'::blogHeader';
+        // 在后台插入样式
         \Typecho\Plugin::factory('admin/header.php')->header = __CLASS__.'::adminHeader';
         // 修改编辑器
         \Typecho\Plugin::factory('admin/write-post.php')->richEditor = __CLASS__.'::richEditor';
@@ -76,30 +77,31 @@ class Plugin implements PluginInterface {
         echo '';
     }
 
-    public static function adminHeader() {
-        $options = \Typecho_Widget::widget('Widget_Options');
-        ?>
-        <!DOCTYPE HTML>
-        <html>
-          <head>
-              <meta charset="<?php $options->charset();?>">
-              <meta name="renderer" content="webkit">
-              <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-              <title><?php _e('%s - %s - Powered by Typecho', $menu->title, $options->title);?></title>
-              <meta name="robots" content="noindex, nofollow">
-              <link rel="stylesheet" href="<?php echo $options->adminStaticUrl('css', 'normalize.css', true); ?>">
-              <link rel="stylesheet" href="<?php echo $options->adminStaticUrl('css', 'grid.css', true); ?>">
-              <link rel="stylesheet" href="<?php echo $options->adminStaticUrl('css', 'style.css', true); ?>">
-              <link rel="stylesheet" type="text/css" href="<?php echo $options->pluginUrl.'/Typecho_Plugin_JJEditor/dist/style.css'; ?>">
-          </head>
-          <body<?php if (isset($bodyClass)) {echo ' class="'.$bodyClass.'"';}?>>
-
-        <?php
-}
+    /**
+     * @description: 在后台插入样式
+     * @param {*} $header
+     * @Date: 2023-08-27 14:01:07
+     * @Author: mulingyuer
+     */
+    public static function adminHeader($header) {
+        $options   = \Typecho_Widget::widget('Widget_Options');
+        $pluginUrl = $options->pluginUrl;
+        $style     = '
+          <link rel="stylesheet" href="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist/default.min.css">
+          <link rel="stylesheet" href="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist/style.css">
+          <link rel="stylesheet" href="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist/katex/katex.min.css">
+          <script src="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist/highlight.min.js"></script>
+          <script src="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist/mermaid.min.js"></script>
+          <script src="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist/katex/katex.min.js"></script>
+        ';
+        return $header.$style;
+    }
 
     public static function richEditor($content, $edit) {
-        $options = \Typecho_Widget::widget('Widget_Options');
-        $path    = $options->pluginUrl.'/Typecho_Plugin_JJEditor/dist/jj_editor.iife.js';
-        echo '<script src="'.$path.'"></script>';
+        $options   = \Typecho_Widget::widget('Widget_Options');
+        $pluginUrl = $options->pluginUrl;
+        echo '
+          <script src="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist/jj_editor.iife.js"></script>
+        ';
     }
 }
