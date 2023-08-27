@@ -1,0 +1,35 @@
+{
+	"name": "typecho-plugin-jj_editor",
+	"private": true,
+	"version": "0.0.0",
+	"type": "module",
+	"scripts": {
+		"watch": "tsc && vite build --watch",
+		"build": "tsc && vite build"
+	},
+	"devDependencies": {
+		"@babel/core": "^7.22.11",
+		"@babel/preset-env": "^7.22.10",
+		"@rollup/plugin-babel": "^6.0.3",
+		"@types/node": "^20.5.6",
+		"rollup-plugin-visualizer": "^5.9.2",
+		"sass": "^1.66.1",
+		"svelte": "^4.2.0",
+		"typescript": "^5.0.2",
+		"vite": "^4.4.5"
+	},
+	"dependencies": {
+		"@bytemd/plugin-gfm": "^1.21.0",
+		"@bytemd/plugin-highlight": "^1.21.0",
+		"@bytemd/plugin-math": "^1.21.0",
+		"@bytemd/plugin-medium-zoom": "^1.21.0",
+		"@bytemd/plugin-mermaid": "^1.21.0",
+		"bytemd": "^1.21.0",
+		"highlight.js": "^11.8.0",
+		"katex": "^0.16.8",
+		"rehype-raw": "^7.0.0",
+		"rehype-stringify": "^10.0.0",
+		"remark-math": "^5.1.1",
+		"remark-rehype": "^10.1.0"
+	}
+}
