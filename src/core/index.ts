@@ -1,7 +1,7 @@
 /*
  * @Author: mulingyuer
  * @Date: 2023-08-27 01:21:30
- * @LastEditTime: 2023-08-27 15:25:52
+ * @LastEditTime: 2023-08-27 15:46:12
  * @LastEditors: mulingyuer
  * @Description: 核心代码
  * @FilePath: /Typecho_Plugin_JJEditor/src/core/index.ts
@@ -22,7 +22,7 @@ export default class JJEditor {
 	/** 原生编辑器 */
 	private nativeEditor = document.getElementById("text") as HTMLTextAreaElement;
 	/** 编辑器容器 */
-	private editorContainer = document.createElement("div");
+	private editorContainer = document.querySelector(".jj-editor-container") as HTMLDivElement;
 	/** 掘金编辑器 */
 	private jjEditor: Editor | undefined;
 
@@ -32,9 +32,6 @@ export default class JJEditor {
 
 	/** 初始化 */
 	private init() {
-		this.editorContainer.classList.add("jj-editor-container");
-		this.nativeEditor.after(this.editorContainer);
-
 		this.jjEditor = new Editor({
 			target: this.editorContainer,
 			props: {

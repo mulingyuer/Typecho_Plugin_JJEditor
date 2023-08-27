@@ -90,9 +90,6 @@ class Plugin implements PluginInterface {
           <link rel="stylesheet" href="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist/default.min.css">
           <link rel="stylesheet" href="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist/style.css">
           <link rel="stylesheet" href="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist/katex/katex.min.css">
-          <script src="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist/highlight.min.js"></script>
-          <script src="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist/mermaid.min.js"></script>
-          <script src="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist/katex/katex.min.js"></script>
         ';
         return $header.$style;
     }
@@ -101,6 +98,10 @@ class Plugin implements PluginInterface {
         $options   = \Typecho_Widget::widget('Widget_Options');
         $pluginUrl = $options->pluginUrl;
         echo '
+          <script src="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist/init.js"></script>
+          <script src="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist/highlight.min.js"></script>
+          <script src="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist/mermaid.min.js"></script>
+          <script src="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist/katex/katex.min.js"></script>
           <script src="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist/jj_editor.iife.js"></script>
         ';
     }
