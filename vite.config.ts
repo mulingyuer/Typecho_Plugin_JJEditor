@@ -1,7 +1,7 @@
 /*
  * @Author: mulingyuer
  * @Date: 2023-08-26 23:50:22
- * @LastEditTime: 2023-08-27 15:40:45
+ * @LastEditTime: 2023-08-27 15:56:41
  * @LastEditors: mulingyuer
  * @Description: vite配置文件
  * @FilePath: /Typecho_Plugin_JJEditor/vite.config.ts
@@ -9,7 +9,7 @@
  */
 import { defineConfig } from "vite";
 // import { babel } from "@rollup/plugin-babel";
-import { visualizer } from "rollup-plugin-visualizer";
+// import { visualizer } from "rollup-plugin-visualizer";
 
 export default defineConfig({
 	build: {
@@ -34,10 +34,10 @@ export default defineConfig({
 		// 	babelHelpers: "bundled",
 		// 	exclude: "node_modules/**"
 		// })
-		visualizer({
-			emitFile: true,
-			filename: "analyzer.html",
-			gzipSize: true
-		})
+		// visualizer({
+		// 	emitFile: true,
+		// 	filename: "analyzer.html",
+		// 	gzipSize: true
+		// })
 	]
 });

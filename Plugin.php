@@ -4,7 +4,7 @@ namespace TypechoPlugin\Typecho_Plugin_JJEditor;
 
 use Typecho\Plugin\PluginInterface;
 use Typecho\Widget\Helper\Form;
-use Typecho\Widget\Helper\Form\Element\Text;
+use Utils\Helper;
 
 if ( ! defined('__TYPECHO_ROOT_DIR__')) {
     exit;
@@ -29,6 +29,7 @@ class Plugin implements PluginInterface {
         \Typecho\Plugin::factory('admin/header.php')->header = __CLASS__.'::adminHeader';
         // 修改编辑器
         \Typecho\Plugin::factory('admin/write-post.php')->richEditor = __CLASS__.'::richEditor';
+        \Typecho\Plugin::factory('admin/write-page.php')->richEditor = __CLASS__.'::richEditor';
     }
 
     /**
@@ -44,8 +45,8 @@ class Plugin implements PluginInterface {
      */
     public static function config(Form $form) {
         /** 分类名称 */
-        $name = new Text('word', null, 'Hello World', _t('说点什么'));
-        $form->addInput($name);
+        // $name = new Text('word', null, 'Hello World', _t('说点什么'));
+        // $form->addInput($name);
     }
 
     /**
@@ -86,10 +87,14 @@ class Plugin implements PluginInterface {
     public static function adminHeader($header) {
         $options   = \Typecho_Widget::widget('Widget_Options');
         $pluginUrl = $options->pluginUrl;
-        $style     = '
-          <link rel="stylesheet" href="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist/default.min.css">
+        $themeUrl  = $options->themeUrl;
+        // 主题样式
+        $defaultTheme = Helper::options()->defaultMarkdownTheme;
+        $style        = '
           <link rel="stylesheet" href="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist/style.css">
           <link rel="stylesheet" href="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist/katex/katex.min.css">
+          <link rel="stylesheet" href="'.$themeUrl.'/static/css/markdown/base.css">
+          <link rel="jj_editor" default='.$defaultTheme.'" href="'.$themeUrl.'/static/css/markdown/">
         ';
         return $header.$style;
     }

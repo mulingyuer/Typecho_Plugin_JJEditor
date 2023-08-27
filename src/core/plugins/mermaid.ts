@@ -1,7 +1,7 @@
 /*
  * @Author: mulingyuer
  * @Date: 2023-08-27 15:13:31
- * @LastEditTime: 2023-08-27 15:31:09
+ * @LastEditTime: 2023-08-27 22:38:23
  * @LastEditors: mulingyuer
  * @Description: mermaid
  * @FilePath: /Typecho_Plugin_JJEditor/src/core/plugins/mermaid.ts

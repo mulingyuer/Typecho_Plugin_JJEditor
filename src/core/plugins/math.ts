@@ -1,7 +1,7 @@
 /*
  * @Author: mulingyuer
  * @Date: 2023-08-27 15:13:31
- * @LastEditTime: 2023-08-27 15:32:31
+ * @LastEditTime: 2023-08-27 22:38:39
  * @LastEditors: mulingyuer
  * @Description: math
  * @FilePath: /Typecho_Plugin_JJEditor/src/core/plugins/math.ts
@@ -9,9 +9,9 @@
  */
 // @ts-nocheck
 import remarkMath from "remark-math";
-const block = "Block formula";
+const block = "块级公式";
 const blockText = "formula";
-const inline = "Inline formula";
+const inline = "行内公式";
 const inlineText = "formula";
 const en = {
 	block,
