@@ -4,7 +4,9 @@ namespace TypechoPlugin\Typecho_Plugin_JJEditor;
 
 use Typecho\Plugin\PluginInterface;
 use Typecho\Widget\Helper\Form;
+use Typecho\Widget\Helper\Form\Element\Radio;
 use Utils\Helper;
+use Widget\Options;
 
 if ( ! defined('__TYPECHO_ROOT_DIR__')) {
     exit;
@@ -44,9 +46,15 @@ class Plugin implements PluginInterface {
      * @param Form $form 配置面板
      */
     public static function config(Form $form) {
-        /** 分类名称 */
-        // $name = new Text('word', null, 'Hello World', _t('说点什么'));
-        // $form->addInput($name);
+        /** 是否与JJ主题联动样式 */
+        $linkage = new Radio('linkage', array('on' => _t('联动'), 'off' => _t('不联动')), 'off', _t('是否与 <a href="https://github.com/mulingyuer/Typecho_Theme_JJ" target="_blank">JJ主题</a> 联动样式'), _t('注意：联动样式只会在编辑器的预览框生效。'));
+        $form->addInput($linkage);
+        /** 是否开启计算公式预览 */
+        $math = new Radio('math', array('on' => _t('开启'), 'off' => _t('关闭')), 'off', _t('是否开启预览计算公式'), _t('注意：开启该功能会加载计算公式依赖，如果服务器网络不好，在无缓存情况下会导致编辑器不会马上加载出来！'));
+        $form->addInput($math);
+        /** 是否开启mermaid 图表 */
+        $mermaid = new Radio('mermaid', array('on' => _t('开启'), 'off' => _t('关闭')), 'off', _t('是否开启mermaid 图表'), _t('注意：开启该功能会加载计算公式依赖，如果服务器网络不好，在无缓存情况下会导致编辑器不会马上加载出来！'));
+        $form->addInput($mermaid);
     }
 
     /**
@@ -90,24 +98,39 @@ class Plugin implements PluginInterface {
         $themeUrl  = $options->themeUrl;
         // 主题样式
         $defaultTheme = Helper::options()->defaultMarkdownTheme;
-        $style        = '
-          <link rel="stylesheet" href="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist/style.css">
-          <link rel="stylesheet" href="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist/katex/katex.min.css">
-          <link rel="stylesheet" href="'.$themeUrl.'/static/css/markdown/base.css">
-          <link rel="jj_editor" default='.$defaultTheme.'" href="'.$themeUrl.'/static/css/markdown/">
-        ';
+        // 插件配置
+        $pluginConfig = Options::alloc()->plugin('Typecho_Plugin_JJEditor');
+        $style        = '<link rel="stylesheet" href="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist/style.css">';
+        // 是否解析数学公式
+        if ($pluginConfig->math === 'on') {
+            $style .= '<link rel="stylesheet" href="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist/katex/katex.min.css">';
+        }
+
+        // config
+        $style .= '<link rel="jj_editor" default-theme="'.$defaultTheme.'" theme-href="'.$themeUrl.'" plugin-href="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist" linkage="'.$pluginConfig->linkage.'" math="'.$pluginConfig->math.'" mermaid="'.$pluginConfig->mermaid.'">';
+
         return $header.$style;
     }
 
     public static function richEditor($content, $edit) {
-        $options   = \Typecho_Widget::widget('Widget_Options');
-        $pluginUrl = $options->pluginUrl;
-        echo '
-          <script src="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist/init.js"></script>
-          <script src="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist/highlight.min.js"></script>
-          <script src="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist/mermaid.min.js"></script>
-          <script src="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist/katex/katex.min.js"></script>
-          <script src="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist/jj_editor.iife.js"></script>
-        ';
+        $options = \Typecho_Widget::widget('Widget_Options');
+        // 插件配置
+        $pluginConfig = Options::alloc()->plugin('Typecho_Plugin_JJEditor');
+        $pluginUrl    = $options->pluginUrl;
+        $script       = '<script src="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist/js/init.js"></script>
+          <script src="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist/js/highlight.min.js"></script>';
+        // 是否解析数学公式
+        if ($pluginConfig->math === 'on') {
+            $script .= '<script src="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist/katex/katex.min.js"></script>';
+        }
+        // 是否开启mermaid 图表
+        if ($pluginConfig->mermaid === 'on') {
+            $script .= '<script src="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist/js/mermaid.min.js"></script>';
+        }
+
+        // iife
+        $script .= '<script src="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist/jj_editor.iife.js"></script>';
+
+        echo $script;
     }
 }
