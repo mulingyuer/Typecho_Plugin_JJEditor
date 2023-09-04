@@ -4,19 +4,23 @@
 	"version": "0.0.0",
 	"type": "module",
 	"scripts": {
-		"watch": "tsc && vite build --watch",
-		"build": "tsc && vite build"
+		"watch": "tsc && cross-env mode=development vite build --watch",
+		"build": "tsc && cross-env mode=production vite build",
+		"build-zip": "ts-node buildCommand/zip.ts"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.22.11",
 		"@babel/preset-env": "^7.22.10",
-		"@rollup/plugin-babel": "^6.0.3",
+		"@types/archiver": "^5.3.2",
 		"@types/node": "^20.5.6",
-		"rollup-plugin-visualizer": "^5.9.2",
+		"archiver": "^6.0.1",
+		"cross-env": "^7.0.3",
 		"sass": "^1.66.1",
 		"svelte": "^4.2.0",
+		"ts-node": "^10.9.1",
 		"typescript": "^5.0.2",
-		"vite": "^4.4.5"
+		"vite": "^4.4.5",
+		"vite-plugin-compression": "^0.5.1"
 	},
 	"dependencies": {
 		"@bytemd/plugin-gfm": "^1.21.0",

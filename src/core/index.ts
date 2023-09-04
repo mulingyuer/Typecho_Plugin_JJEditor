@@ -1,7 +1,7 @@
 /*
  * @Author: mulingyuer
  * @Date: 2023-08-27 01:21:30
- * @LastEditTime: 2023-08-27 22:42:47
+ * @LastEditTime: 2023-09-04 00:38:47
  * @LastEditors: mulingyuer
  * @Description: 核心代码
  * @FilePath: /Typecho_Plugin_JJEditor/src/core/index.ts
@@ -12,12 +12,10 @@ import "bytemd/dist/index.css";
 import zhHans from "bytemd/locales/zh_Hans.json";
 import gfm from "@bytemd/plugin-gfm";
 import highlight from "./plugins/highlight";
-// import "highlight.js/styles/default.css";
 import math from "./plugins/math";
-// import "katex/dist/katex.css";
 import mediumZoom from "@bytemd/plugin-medium-zoom";
 import mermaid from "./plugins/mermaid";
-// import codePlacement from "./plugins/codePlacement";
+import type { EditorConfig, Plugins } from "./types";
 
 // mermaid汉化
 const MERMAID_LOCALE = {
@@ -49,40 +47,72 @@ export default class JJEditor {
 	private editorContainer = document.querySelector(".jj-editor-container") as HTMLDivElement;
 	/** 掘金编辑器 */
 	private jjEditor: Editor | undefined;
-	/** 样式链接link元素 */
-	private styleLink = document.querySelector('link[rel="jj_editor"]');
-	/** 样式链接前缀 */
-	private styleLinkPrefix = "";
-	/** jj主题默认文章样式 */
-	private JJDefaultTheme: string = "";
+	/** 配置数据 */
+	private config: EditorConfig = {
+		rel: "",
+		"default-theme": "",
+		"theme-href": "",
+		"plugin-href": "",
+		linkage: "",
+		math: "",
+		mermaid: ""
+	};
 	/** 预览样式link元素 */
 	private previewStyleLink: HTMLLinkElement | undefined;
 
 	constructor() {
-		this.init();
+		this.config = this.getEditorConfig();
 		this.initPreviewStyle();
+		this.initEdit();
 	}
 
-	/** 初始化 */
-	private init() {
+	/** 获取配置 */
+	private getEditorConfig(): EditorConfig {
+		const link = document.querySelector('link[rel="jj_editor"]')!;
+		let config: EditorConfig = {
+			rel: "",
+			"default-theme": "",
+			"theme-href": "",
+			"plugin-href": "",
+			linkage: "",
+			math: "",
+			mermaid: ""
+		};
+		Array.from(link.attributes).forEach((attr) => {
+			const key = attr.name as keyof EditorConfig;
+			const val = attr.value as EditorConfig[keyof EditorConfig];
+			config[key] = val;
+		});
+		return config;
+	}
+
+	/** 编辑器初始化 */
+	private initEdit() {
+		/** 插件处理 */
+		const plugins: Plugins = [gfm(), highlight(), mediumZoom()];
+		// 是否解析数学公式
+		if (this.config.math === "on") {
+			plugins.push(math({ locale: MATH_LOCALE, katexOptions: {} }));
+		}
+		/** 是否开启mermaid 图表 */
+		if (this.config.mermaid === "on") {
+			plugins.push(mermaid({ locale: MERMAID_LOCALE }));
+		}
+
+		//创建编辑器实例
 		this.jjEditor = new Editor({
 			target: this.editorContainer,
 			props: {
 				value: this.nativeEditor.value,
 				locale: zhHans,
-				plugins: [
-					gfm(),
-					highlight(),
-					math({ locale: MATH_LOCALE, katexOptions: {} }),
-					mediumZoom(),
-					mermaid({ locale: MERMAID_LOCALE })
-				]
+				plugins
 			}
 		});
+		//监听编辑器变化
 		this.jjEditor.$on("change", this.onEditorChange);
 	}
 
-	/** change事件 */
+	/** 编辑器change事件 */
 	private onEditorChange = (event: any) => {
 		this.jjEditor!.$set({ value: event.detail.value });
 		this.nativeEditor.value = event.detail.value;
@@ -90,41 +120,65 @@ export default class JJEditor {
 
 	/** 初始化预览样式 */
 	private initPreviewStyle() {
-		if (!this.styleLink) return;
-		let theme = "juejin";
-		this.styleLinkPrefix = this.styleLink.getAttribute("href")!;
-		this.JJDefaultTheme = this.styleLink.getAttribute("default")!;
-		if (typeof this.JJDefaultTheme === "string" && this.JJDefaultTheme.trim() === "") {
-			this.JJDefaultTheme = "juejin";
+		//保底处理，防止默认主题为空
+		if (typeof this.config["default-theme"] === "string" && this.config["default-theme"].trim() === "") {
+			this.config["default-theme"] = "juejin";
 		}
+		//是否联动JJ主题
+		if (this.config.linkage === "on") {
+			this.linkagePreviewStyle();
+		} else {
+			//走默认掘金主题
+			this.defaultPreviewStyle();
+		}
+	}
+
+	/** 联动JJ主题样式 */
+	private linkagePreviewStyle() {
+		let theme = "juejin";
 		//获取用户配置
 		const themeSelect = document.querySelector('select[name="fields[markdownTheme]"]') as HTMLSelectElement;
 		if (themeSelect) {
 			const selectTheme = themeSelect.value;
-			if (this.JJDefaultTheme !== "juejin" && selectTheme === "juejin") {
-				theme = this.JJDefaultTheme;
+			if (this.config["default-theme"] !== "juejin" && selectTheme === "juejin") {
+				theme = this.config["default-theme"];
 			} else {
 				theme = selectTheme;
 			}
 			//事件监听
 			themeSelect.addEventListener("change", (event) => {
 				const theme = (event.currentTarget as HTMLSelectElement).value;
-				this.setPreviewStyle(theme);
+				this.setLinkagePreviewStyle(theme);
 			});
 		} else {
-			theme = this.JJDefaultTheme;
+			theme = this.config["default-theme"];
 		}
-		this.setPreviewStyle(theme);
+		this.setLinkagePreviewStyle(theme);
 	}
 
-	/** 设置预览样式 */
-	public setPreviewStyle(theme: string) {
+	/**  联动JJ主题样式设置预览样式 */
+	private setLinkagePreviewStyle(theme: string) {
 		if (!this.previewStyleLink) {
-			this.previewStyleLink = document.createElement("link");
-			this.previewStyleLink.setAttribute("rel", "stylesheet");
-			this.previewStyleLink.setAttribute("type", "text/css");
+			this.previewStyleLink = this.createLink();
 			document.head.appendChild(this.previewStyleLink);
 		}
-		this.previewStyleLink.setAttribute("href", `${this.styleLinkPrefix}/${theme}.css`);
+		this.previewStyleLink.setAttribute("href", `${this.config["theme-href"]}/static/css/markdown/${theme}.css`);
+	}
+
+	/** 默认预览样式 */
+	private defaultPreviewStyle() {
+		const baskLink = this.createLink(`${this.config["plugin-href"]}/css/base.css`);
+		const styleLink = this.createLink(`${this.config["plugin-href"]}/css/juejin.css`);
+		document.head.appendChild(baskLink);
+		document.head.appendChild(styleLink);
+	}
+
+	/** 创建一个link元素 */
+	private createLink(href?: string) {
+		const link = document.createElement("link");
+		link.setAttribute("rel", "stylesheet");
+		link.setAttribute("type", "text/css");
+		if (href) link.setAttribute("href", href);
+		return link;
 	}
 }
