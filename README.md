@@ -10,8 +10,22 @@ Typecho 插件-《掘金编辑器》
 
 ## 效果图
 
-![Typecho_Plugin_JJEditor预览图](/Typecho_Plugin_JJEditor01.gif)
+![Typecho_Plugin_JJEditor预览图](/docs/images/Typecho_Plugin_JJEditor01.gif)
 
 ## 联动主题
 
 [《Typecho_Theme_JJ 高仿掘金主题》](https://github.com/mulingyuer/Typecho_Theme_JJ)
+
+## 主题配置
+
+由于数学公式和 mermaid 图表解析需要比较大的依赖包，为此做成了可选项，默认是关闭了，这样打开编辑器时不会因为网络太差而转圈很久，而且大部分人的博客其实是不怎么用得到的。
+
+主题联动也是默认关闭的，默认会有一个掘金样式文件加载，这样方便在非联动主题下，也能良好的预览内容。
+
+![Typecho_Plugin_JJEditor配置](/docs/images/Typecho_Plugin_JJEditor02.jpg)
+
+## 注意事项
+
+更新插件前请先禁用本插件，更新完插件内容后再启用，以免出现问题。
+
+启用后清理下浏览器缓存（CTRL+SHIFT+R），以避免样式不更新问题。
