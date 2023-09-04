@@ -19,5 +19,8 @@
 		"noUnusedParameters": true,
 		"noFallthroughCasesInSwitch": true
 	},
+	"ts-node": {
+		"esm": true
+	},
 	"include": ["src"]
 }
