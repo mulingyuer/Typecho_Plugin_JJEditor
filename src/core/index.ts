@@ -1,7 +1,7 @@
 /*
  * @Author: mulingyuer
  * @Date: 2023-08-27 01:21:30
- * @LastEditTime: 2023-12-23 00:55:20
+ * @LastEditTime: 2023-12-23 02:32:37
  * @LastEditors: mulingyuer
  * @Description: 核心代码
  * @FilePath: /Typecho_Plugin_JJEditor/src/core/index.ts
@@ -46,10 +46,15 @@ export class JJEditor {
 	private highlightThemeLink = this.createLinkElement();
 	// 代码高亮主题
 	private highlightSelect: HTMLSelectElement | null = document.querySelector('select[name="fields[highlightTheme]"]');
+	// 友链样式checkbox元素
+	private linksStyleCheckBox: HTMLInputElement | null = document.querySelector('input[name="fields[openLinkStyle][]"]');
+	// 友链样式link元素
+	private linksLink = this.createLinkElement();
 
 	constructor() {
 		Object.assign(this.config, this.getConfig());
 		this.initPreviewStyle();
+		this.initLinksPreviewStyle();
 		this.initEditor();
 	}
 
@@ -166,6 +171,25 @@ export class JJEditor {
 		document.head.appendChild(this.baseLink);
 		document.head.appendChild(this.articleThemeLink);
 		document.head.appendChild(this.highlightThemeLink);
+	}
+
+	/** 初始化友链预览样式 */
+	private initLinksPreviewStyle() {
+		if (!this.linksStyleCheckBox) return;
+		if (!this.linksStyleCheckBox.checked) return;
+		const href = `${this.config["plugin-href"]}/css/links.css`;
+		this.linksLink.setAttribute("href", href);
+		// 监听事件
+		this.linksStyleCheckBox.addEventListener("change", () => {
+			if (this.linksStyleCheckBox!.checked) {
+				this.linksLink.setAttribute("href", href);
+			} else {
+				this.linksLink.setAttribute("href", "");
+			}
+		});
+
+		// 插入元素
+		document.head.appendChild(this.linksLink);
 	}
 
 	/** 创建link元素 */
