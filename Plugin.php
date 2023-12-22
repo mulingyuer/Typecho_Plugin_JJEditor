@@ -147,7 +147,7 @@ class Plugin implements PluginInterface {
             ),
             array(''),
             _t('是否启用友链样式'),
-            _t('启用后可以预览 <a href="https://github.com/mulingyuer/Typecho_Theme_JJ" target="_blank">JJ主题</a> 的友链样式效果，如果是其他主题不能保证不出问题。最好仅友链页启用。'));
+            _t('启用后可以预览 <a href="https://github.com/mulingyuer/Typecho_Theme_JJ" target="_blank">JJ主题</a> 的友链样式效果，如果是其他主题只能在编辑页有效果。该设置仅友链页启用即可。'));
         $layout->addItem($openLinkStyle);
 
     }
