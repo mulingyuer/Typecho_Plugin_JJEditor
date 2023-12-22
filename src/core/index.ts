@@ -1,7 +1,7 @@
 /*
  * @Author: mulingyuer
  * @Date: 2023-08-27 01:21:30
- * @LastEditTime: 2023-12-23 02:32:37
+ * @LastEditTime: 2023-12-23 03:08:29
  * @LastEditors: mulingyuer
  * @Description: 核心代码
  * @FilePath: /Typecho_Plugin_JJEditor/src/core/index.ts
@@ -175,10 +175,15 @@ export class JJEditor {
 
 	/** 初始化友链预览样式 */
 	private initLinksPreviewStyle() {
+		// 插入元素
+		document.head.appendChild(this.linksLink);
+		// 设置link的href
 		if (!this.linksStyleCheckBox) return;
-		if (!this.linksStyleCheckBox.checked) return;
 		const href = `${this.config["plugin-href"]}/css/links.css`;
-		this.linksLink.setAttribute("href", href);
+		// 判断是否选中
+		if (this.linksStyleCheckBox.checked) {
+			this.linksLink.setAttribute("href", href);
+		}
 		// 监听事件
 		this.linksStyleCheckBox.addEventListener("change", () => {
 			if (this.linksStyleCheckBox!.checked) {
@@ -187,9 +192,6 @@ export class JJEditor {
 				this.linksLink.setAttribute("href", "");
 			}
 		});
-
-		// 插入元素
-		document.head.appendChild(this.linksLink);
 	}
 
 	/** 创建link元素 */
