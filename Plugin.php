@@ -4,6 +4,7 @@ namespace TypechoPlugin\Typecho_Plugin_JJEditor;
 
 use Typecho\Plugin\PluginInterface;
 use Typecho\Widget\Helper\Form;
+use Typecho\Widget\Helper\Form\Element\Checkbox;
 use Typecho\Widget\Helper\Form\Element\Radio;
 use Utils\Helper;
 use Widget\Options;
@@ -17,7 +18,7 @@ if ( ! defined('__TYPECHO_ROOT_DIR__')) {
  *
  * @package Typecho_Plugin_JJEditor
  * @author mulingyuer
- * @version 1.1.0
+ * @version 1.2.0
  * @link https: //www.mulingyuer.com
  */
 class Plugin implements PluginInterface {
@@ -32,6 +33,8 @@ class Plugin implements PluginInterface {
         // 修改编辑器
         \Typecho\Plugin::factory('admin/write-post.php')->richEditor = __CLASS__.'::richEditor';
         \Typecho\Plugin::factory('admin/write-page.php')->richEditor = __CLASS__.'::richEditor';
+        // 独立页面插入自定义字段
+        \Typecho\Plugin::factory('Widget_Contents_Page_Edit')->getDefaultFieldItems = __CLASS__.'::addFields';
     }
 
     /**
@@ -112,6 +115,7 @@ class Plugin implements PluginInterface {
         return $header.$style;
     }
 
+    /** 自定义编辑器 */
     public static function richEditor($content, $edit) {
         $options = \Typecho_Widget::widget('Widget_Options');
         // 插件配置
@@ -133,4 +137,19 @@ class Plugin implements PluginInterface {
 
         echo $script;
     }
+
+    /** 添加自定义字段 */
+    public static function addFields($layout) {
+        // 是否启用友链样式
+        $openLinkStyle = new Checkbox('openLinkStyle',
+            array(
+                'open' => _t('开启'),
+            ),
+            array(''),
+            _t('是否启用友链样式'),
+            _t('启用后可以预览 <a href="https://github.com/mulingyuer/Typecho_Theme_JJ" target="_blank">JJ主题</a> 的友链样式效果，如果是其他主题只能在编辑页有效果。该设置仅友链页启用即可。'));
+        $layout->addItem($openLinkStyle);
+
+    }
+
 }
