@@ -18,7 +18,7 @@ if ( ! defined('__TYPECHO_ROOT_DIR__')) {
  *
  * @package Typecho_Plugin_JJEditor
  * @author mulingyuer
- * @version 1.2.0
+ * @version 1.2.1
  * @link https: //www.mulingyuer.com
  */
 class Plugin implements PluginInterface {
@@ -96,6 +96,12 @@ class Plugin implements PluginInterface {
      * @Author: mulingyuer
      */
     public static function adminHeader($header) {
+        // 获取当前页面的请求URL
+        $request = new \Typecho\Request();
+        $url     = $request->getRequestUrl();
+        if (strpos($url, '/admin/write-post.php') === false && strpos($url, '/admin/write-page.php') === false) {
+            return $header;
+        }
         $options   = \Typecho_Widget::widget('Widget_Options');
         $pluginUrl = $options->pluginUrl;
         $themeUrl  = $options->themeUrl;
