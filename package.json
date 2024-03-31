@@ -6,7 +6,7 @@
 	"scripts": {
 		"watch": "tsc && cross-env mode=development vite build --watch",
 		"build": "tsc && cross-env mode=production vite build",
-		"build-zip": "ts-node buildCommand/zip.ts"
+		"build-zip": "node --loader ts-node/esm ./buildCommand/zip.ts"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.22.11",
