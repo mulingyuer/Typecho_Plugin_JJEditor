@@ -96,6 +96,12 @@ class Plugin implements PluginInterface {
      * @Author: mulingyuer
      */
     public static function adminHeader($header) {
+        // 获取当前页面的请求URL
+        $request = new \Typecho\Request();
+        $url     = $request->getRequestUrl();
+        if (strpos($url, '/admin/write-post.php') === false && strpos($url, '/admin/write-page.php') === false) {
+            return $header;
+        }
         $options   = \Typecho_Widget::widget('Widget_Options');
         $pluginUrl = $options->pluginUrl;
         $themeUrl  = $options->themeUrl;
