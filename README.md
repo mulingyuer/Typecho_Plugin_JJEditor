@@ -8,6 +8,12 @@ Typecho 插件-《掘金编辑器》
 
 编辑器和高仿掘金主题实现主题展示联动，支持数学公式和 mermaid 图表，但是由于 Typecho 默认的解析器不支持，所以即便你通过编辑器使用了该功能，实际页面也无法正确展示，如果你需要的话可以去找一些增强解析的插件，比如：[typecho-markdown](https://github.com/mrgeneralgoo/typecho-markdown)，使用这个插件可以让 Typecho 前端正确解析数学公式和 mermaid 图表。
 
+## 仓库镜像地址
+
+由于国内部分用户反馈github不方便查看，特意加了国内的Gitee地址。
+
+Gitee仓库：[Typecho_Theme_JJ](https://gitee.com/mulingyuer/Typecho_Plugin_JJEditor)
+
 ## 效果图
 
 ![Typecho_Plugin_JJEditor预览图](/docs/images/Typecho_Plugin_JJEditor01.gif)
