@@ -1,6 +1,12 @@
-#text {
+label[for="text"],
+.resize {
 	display: none;
 }
-#text + .resize {
-	display: none;
+#text,
+#wmd-button-bar {
+	position: absolute;
+	width: 0;
+	height: 0;
+	top: -9999px;
+	left: -9999px;
 }

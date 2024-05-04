@@ -1,7 +1,7 @@
 /*
  * @Author: mulingyuer
  * @Date: 2023-08-27 01:21:30
- * @LastEditTime: 2023-12-23 03:08:29
+ * @LastEditTime: 2024-05-05 01:37:21
  * @LastEditors: mulingyuer
  * @Description: 核心代码
  * @FilePath: /Typecho_Plugin_JJEditor/src/core/index.ts
@@ -18,12 +18,15 @@ import mermaid from "./plugins/mermaid";
 import { MATH_LOCALE, MERMAID_LOCALE } from "./language/zh";
 import { MARKDOWN_HIGHLIGHT_MAP } from "./constant/markdown";
 import type { EditorConfig, Plugins } from "./types";
+import image from "./plugins/image";
 
 export class JJEditor {
 	/** 默认的编辑器TextArea元素 */
 	private defaultTextArea: HTMLTextAreaElement = document.getElementById("text") as HTMLTextAreaElement;
 	/** 编辑器容器 */
 	private editorContainer = document.querySelector(".jj-editor-container") as HTMLDivElement;
+	/** 文本 */
+	private text: string = "";
 	/** 掘金编辑器实例 */
 	private editor: Editor | undefined;
 	/** 编辑器插件配置数据 */
@@ -87,7 +90,7 @@ export class JJEditor {
 	/** 初始化编辑器 */
 	private initEditor() {
 		/** 插件处理 */
-		const plugins: Plugins = [gfm(), highlight(), mediumZoom()];
+		const plugins: Plugins = [gfm(), highlight(), mediumZoom(), image()];
 		// 是否解析数学公式
 		if (this.config.math === "on") {
 			plugins.push(math({ locale: MATH_LOCALE, katexOptions: {} }));
@@ -101,16 +104,19 @@ export class JJEditor {
 		this.editor = new Editor({
 			target: this.editorContainer,
 			props: {
-				value: this.defaultTextArea.value,
+				value: (this.text = this.defaultTextArea.value),
 				locale: zhHans,
 				plugins
 			}
 		});
 		//监听编辑器变化
 		this.editor.$on("change", (event) => {
+			this.text = event.detail.value;
 			this.editor?.$set({ value: event.detail.value });
 			this.defaultTextArea.value = event.detail.value;
 		});
+		// 监听textarea变化
+		this.watchTextAreaValue(this.defaultTextArea);
 	}
 
 	/** 初始化预览样式 */
@@ -201,5 +207,39 @@ export class JJEditor {
 		link.setAttribute("type", "text/css");
 		if (href) link.setAttribute("href", href);
 		return link;
+	}
+
+	/** 监听textarea的value变化 */
+	private watchTextAreaValue(textarea: HTMLTextAreaElement) {
+		const self = this;
+		// 默认的对象描述
+		const descriptor = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, "value")!;
+		const originalSetter = descriptor.set!;
+		// timer
+		let timer: NodeJS.Timeout | null = null;
+
+		Object.defineProperty(textarea, "value", {
+			set(newValue) {
+				// 调用原生的 setter
+				originalSetter.call(this, newValue);
+
+				// 更新编辑器文本
+				if (self.text !== newValue) {
+					self.editor?.$set({ value: newValue });
+					// 取消选择文本
+					if (timer) {
+						clearTimeout(timer);
+						timer = null;
+					}
+					timer = setTimeout(() => {
+						const selection = window.getSelection();
+						selection?.removeAllRanges();
+						textarea.focus();
+						textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+					});
+				}
+			},
+			get: descriptor.get
+		});
 	}
 }

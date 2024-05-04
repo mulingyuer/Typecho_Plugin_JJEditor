@@ -1,15 +1,13 @@
 <?php
-
 namespace TypechoPlugin\Typecho_Plugin_JJEditor;
 
 use Typecho\Plugin\PluginInterface;
 use Typecho\Widget\Helper\Form;
-use Typecho\Widget\Helper\Form\Element\Checkbox;
 use Typecho\Widget\Helper\Form\Element\Radio;
 use Utils\Helper;
 use Widget\Options;
 
-if ( ! defined('__TYPECHO_ROOT_DIR__')) {
+if (!defined('__TYPECHO_ROOT_DIR__')) {
     exit;
 }
 
@@ -18,29 +16,34 @@ if ( ! defined('__TYPECHO_ROOT_DIR__')) {
  *
  * @package Typecho_Plugin_JJEditor
  * @author mulingyuer
- * @version 1.2.1
- * @link https: //www.mulingyuer.com
+ * @version 1.2.2
+ * @link https://github.com/mulingyuer/Typecho_Plugin_JJEditor
  */
-class Plugin implements PluginInterface {
+class Plugin implements PluginInterface
+{
     /**
      * 激活插件方法,如果激活失败,直接抛出异常
      */
-    public static function activate() {
-        // 在博客前端插入公共资源，比如css、js
-        \Typecho\Plugin::factory('Widget_Archive')->header = __CLASS__.'::blogHeader';
-        // 在后台插入样式
-        \Typecho\Plugin::factory('admin/header.php')->header = __CLASS__.'::adminHeader';
-        // 修改编辑器
-        \Typecho\Plugin::factory('admin/write-post.php')->richEditor = __CLASS__.'::richEditor';
-        \Typecho\Plugin::factory('admin/write-page.php')->richEditor = __CLASS__.'::richEditor';
+    public static function activate()
+    {
+        // 自定义header
+        \Typecho\Plugin::factory('admin/header.php')->header = [__CLASS__, 'header'];
+
+        // footer插入脚本
+        \Typecho\Plugin::factory('admin/footer.php')->begin = [__CLASS__, 'footer'];
+
         // 独立页面插入自定义字段
-        \Typecho\Plugin::factory('Widget_Contents_Page_Edit')->getDefaultFieldItems = __CLASS__.'::addFields';
+        \Typecho\Plugin::factory('Widget_Contents_Page_Edit')->getDefaultFieldItems = __CLASS__ . '::addFields';
+
+        return _t("插件已启用");
     }
 
     /**
      * 禁用插件方法,如果禁用失败,直接抛出异常
      */
-    public static function deactivate() {
+    public static function deactivate()
+    {
+        return _t("插件已禁用");
     }
 
     /**
@@ -48,7 +51,8 @@ class Plugin implements PluginInterface {
      *
      * @param Form $form 配置面板
      */
-    public static function config(Form $form) {
+    public static function config(Form $form)
+    {
         /** 是否与JJ主题联动样式 */
         $linkage = new Radio('linkage', array('on' => _t('联动'), 'off' => _t('不联动')), 'off', _t('是否与 <a href="https://github.com/mulingyuer/Typecho_Theme_JJ" target="_blank">JJ主题</a> 联动样式'), _t('注意：联动样式只会在编辑器的预览框生效。'));
         $form->addInput($linkage);
@@ -65,7 +69,8 @@ class Plugin implements PluginInterface {
      *
      * @param Form $form
      */
-    public static function personalConfig(Form $form) {
+    public static function personalConfig(Form $form)
+    {
     }
 
     /**
@@ -74,78 +79,107 @@ class Plugin implements PluginInterface {
      * @access public
      * @return void
      */
-    public static function render() {
-        // echo '<span class="message success">'
-        // .htmlspecialchars(Options::alloc()->plugin('HelloWorld')->word)
-        //     .'</span>';
+    public static function render()
+    {
     }
 
-    /**
-     * @description: 在博客前端插入公共资源，比如css、js
-     * @Date: 2023-08-27 00:34:29
-     * @Author: mulingyuer
-     */
-    public static function blogHeader() {
-        echo '';
-    }
-
-    /**
-     * @description: 在后台插入样式
-     * @param {*} $header
-     * @Date: 2023-08-27 14:01:07
-     * @Author: mulingyuer
-     */
-    public static function adminHeader($header) {
-        // 获取当前页面的请求URL
-        $request = new \Typecho\Request();
-        $url     = $request->getRequestUrl();
-        if (strpos($url, '/admin/write-post.php') === false && strpos($url, '/admin/write-page.php') === false) {
+    /** 自定义header */
+    public static function header($header)
+    {
+        $isEditPage = self::isEditPage();
+        if (!$isEditPage) {
             return $header;
         }
-        $options   = \Typecho_Widget::widget('Widget_Options');
+
+        $my_css = self::getEditorCSS();
+
+        return $header . $my_css;
+    }
+
+    /** 自定义footer */
+    public static function footer()
+    {
+        $isEditPage = self::isEditPage();
+        if (!$isEditPage) {
+            return;
+        }
+
+        echo self::getEditorJS();
+    }
+
+    /** 判断是否编辑文章页 */
+    public static function isEditPage()
+    {
+        // 获取当前页面的请求URL
+        $request = new \Typecho\Request();
+        $url = $request->getRequestUrl();
+        if (strpos($url, '/admin/write-post.php') !== false || strpos($url, '/admin/write-page.php') !== false) {
+            return true;
+        }
+        return false;
+    }
+
+    /** 获取编辑器css样式 */
+    public static function getEditorCSS()
+    {
+        $options = \Typecho_Widget::widget('Widget_Options');
         $pluginUrl = $options->pluginUrl;
-        $themeUrl  = $options->themeUrl;
+        $themeUrl = $options->themeUrl;
         // 主题样式
         $defaultTheme = Helper::options()->defaultMarkdownTheme;
         // 插件配置
         $pluginConfig = Options::alloc()->plugin('Typecho_Plugin_JJEditor');
-        $style        = '<link rel="stylesheet" href="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist/style.css">';
+        $style = self::generatedLink($pluginUrl . "/Typecho_Plugin_JJEditor/dist/style.css");
         // 是否解析数学公式
         if ($pluginConfig->math === 'on') {
-            $style .= '<link rel="stylesheet" href="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist/katex/katex.min.css">';
+            $style .= self::generatedLink($pluginUrl . "/Typecho_Plugin_JJEditor/dist/katex/katex.min.css");
         }
 
         // config
-        $style .= '<link rel="jj_editor" default-theme="'.$defaultTheme.'" theme-href="'.$themeUrl.'" plugin-href="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist" linkage="'.$pluginConfig->linkage.'" math="'.$pluginConfig->math.'" mermaid="'.$pluginConfig->mermaid.'">';
+        $style .= '<link rel="jj_editor" default-theme="' . $defaultTheme . '" theme-href="' . $themeUrl . '" plugin-href="' . $pluginUrl . '/Typecho_Plugin_JJEditor/dist" linkage="' . $pluginConfig->linkage . '" math="' . $pluginConfig->math . '" mermaid="' . $pluginConfig->mermaid . '">';
 
-        return $header.$style;
+        return $style;
     }
 
-    /** 自定义编辑器 */
-    public static function richEditor($content, $edit) {
+    /** 获取编辑器JavaScript脚本 */
+    public static function getEditorJS()
+    {
         $options = \Typecho_Widget::widget('Widget_Options');
         // 插件配置
         $pluginConfig = Options::alloc()->plugin('Typecho_Plugin_JJEditor');
-        $pluginUrl    = $options->pluginUrl;
-        $script       = '<script src="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist/js/init.js"></script>
-          <script src="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist/js/highlight.min.js"></script>';
+        $pluginUrl = $options->pluginUrl;
+        $script = self::generatedScript($pluginUrl . "/Typecho_Plugin_JJEditor/dist/js/init.js") .
+        self::generatedScript($pluginUrl . "/Typecho_Plugin_JJEditor/dist/js/highlight.min.js");
         // 是否解析数学公式
         if ($pluginConfig->math === 'on') {
-            $script .= '<script src="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist/katex/katex.min.js"></script>';
+            $script .= self::generatedScript($pluginUrl . "/Typecho_Plugin_JJEditor/dist/katex/katex.min.js");
         }
         // 是否开启mermaid 图表
         if ($pluginConfig->mermaid === 'on') {
-            $script .= '<script src="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist/js/mermaid.min.js"></script>';
+            $script .= self::generatedScript($pluginUrl . "/Typecho_Plugin_JJEditor/dist/js/mermaid.min.js");
         }
 
         // iife
-        $script .= '<script src="'.$pluginUrl.'/Typecho_Plugin_JJEditor/dist/jj_editor.iife.js"></script>';
+        $script .= self::generatedScript($pluginUrl . "/Typecho_Plugin_JJEditor/dist/jj_editor.iife.js");
 
-        echo $script;
+        return $script;
+    }
+
+    /** 生成link元素脚本 */
+    public static function generatedLink($href)
+    {
+        return '<link rel="stylesheet" href="' . $href . '">';
+    }
+
+    /** 生成script元素脚本 */
+    public static function generatedScript($src)
+    {
+        return '<script src="' . $src . '"></script>';
     }
 
     /** 添加自定义字段 */
-    public static function addFields($layout) {
+    public static function addFields($layout)
+    {
         // 是否启用友链样式
         $openLinkStyle = new Checkbox('openLinkStyle',
             array(
