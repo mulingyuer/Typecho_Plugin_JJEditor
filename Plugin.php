@@ -16,8 +16,8 @@ if (!defined('__TYPECHO_ROOT_DIR__')) {
  *
  * @package Typecho_Plugin_JJEditor
  * @author mulingyuer
- * @version 1.2.1
- * @link https: //www.mulingyuer.com
+ * @version 1.2.2
+ * @link https://github.com/mulingyuer/Typecho_Plugin_JJEditor
  */
 class Plugin implements PluginInterface
 {
