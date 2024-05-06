@@ -3,6 +3,7 @@ namespace TypechoPlugin\Typecho_Plugin_JJEditor;
 
 use Typecho\Plugin\PluginInterface;
 use Typecho\Widget\Helper\Form;
+use Typecho\Widget\Helper\Form\Element\Checkbox;
 use Typecho\Widget\Helper\Form\Element\Radio;
 use Utils\Helper;
 use Widget\Options;
@@ -16,7 +17,7 @@ if (!defined('__TYPECHO_ROOT_DIR__')) {
  *
  * @package Typecho_Plugin_JJEditor
  * @author mulingyuer
- * @version 1.2.2
+ * @version 1.2.3
  * @link https://github.com/mulingyuer/Typecho_Plugin_JJEditor
  */
 class Plugin implements PluginInterface
