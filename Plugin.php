@@ -3,6 +3,7 @@ namespace TypechoPlugin\Typecho_Plugin_JJEditor;
 
 use Typecho\Plugin\PluginInterface;
 use Typecho\Widget\Helper\Form;
+use Typecho\Widget\Helper\Form\Element\Checkbox;
 use Typecho\Widget\Helper\Form\Element\Radio;
 use Utils\Helper;
 use Widget\Options;
