@@ -114,7 +114,7 @@ class Plugin implements PluginInterface
         // 获取当前页面的请求URL
         $request = new \Typecho\Request();
         $url = $request->getRequestUrl();
-        if (strpos($url, '/admin/write-post.php') !== false || strpos($url, '/admin/write-page.php') !== false) {
+        if (strpos($url, __TYPECHO_ADMIN_DIR__ . 'write-post.php') !== false || strpos($url, __TYPECHO_ADMIN_DIR__ . 'write-page.php') !== false) {
             return true;
         }
         return false;
