@@ -17,7 +17,7 @@ if (!defined('__TYPECHO_ROOT_DIR__')) {
  *
  * @package Typecho_Plugin_JJEditor
  * @author mulingyuer
- * @version 1.2.3
+ * @version 1.2.4
  * @link https://github.com/mulingyuer/Typecho_Plugin_JJEditor
  */
 class Plugin implements PluginInterface
@@ -114,7 +114,7 @@ class Plugin implements PluginInterface
         // 获取当前页面的请求URL
         $request = new \Typecho\Request();
         $url = $request->getRequestUrl();
-        if (strpos($url, '/admin/write-post.php') !== false || strpos($url, '/admin/write-page.php') !== false) {
+        if (strpos($url, __TYPECHO_ADMIN_DIR__ . 'write-post.php') !== false || strpos($url, __TYPECHO_ADMIN_DIR__ . 'write-page.php') !== false) {
             return true;
         }
         return false;
